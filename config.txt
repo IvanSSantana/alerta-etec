@@ -1,0 +1,4 @@
+-- Alinhamento de dependências
+npm i
+npx expo install --fix
+npx expo-doctor
