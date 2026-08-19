@@ -5,7 +5,7 @@ export type Occurrence =
     | 'Problema no trajeto'
     | 'Consulta médica'
     | 'Problemas'
-    | 'Putro';
+    | 'Outro';
 
 export const onlyDigits = (value: string): string =>
     value.replace(/\D/g, '').slice(0, 11);
@@ -15,7 +15,7 @@ export function formatPhone(value: string): string {
 
     if (digits.length <= 2) return digits;
     if (digits.length <= 7) {
-        return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+        return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
     };
     if (digits.length <= 10) {
         return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
@@ -28,4 +28,23 @@ export function isValidBrazilianPhone(value: string): boolean {
     return [10, 11].includes(onlyDigits(value).length);
 };
 
+export function buildMessage(name: string, occurrence: Occurrence, note: string) {
+    const student = name.trim() || 'Estudante';
+    const studentMessage = `Olá, sou ${student}, estudante da ETEC.`;
+
+    const messages: Record<Occurrence, string> = {
+       'Atraso no transporte' : studentMessage + 'Meu transporte apresentou um imprevisto e poderei chegar atrasado.',
+        'Problema no trajeto' : studentMessage + 'Tive um problema durante o trajeto e gostaria de avisar.',
+        'Consulta médica' : studentMessage + 'Não irei comparecer a aula hoje, pois estou em consulta médica.',
+        'Problemas' : studentMessage + 'Não irei comparecer a aula hoje, devido a problemas pessoais.',
+        'Outro' : studentMessage + 'Gostaria de comunicar uma ocorrência.'
+    };
+
+    return messages[occurrence] + (!!note.trim() ? `Observação: ${note.trim()}` : '');
+};
+
+export function smsUrl(phone: string, message: string) {
+    const separator = Platform.OS === 'ios' ? '&' : '?';
+    return `sms: ${onlyDigits(phone)}${separator}body=${encodeURIComponent(message)}`;
+};
 
